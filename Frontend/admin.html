@@ -14,6 +14,13 @@
     <script type="module" src="js/auth.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo+Play:wght@200..1000&family=Metrophobic&display=swap"
         rel="stylesheet">
+    <script type="text/javascript">
+        (function () {
+            emailjs.init({
+                publicKey: "UhllMHuKgMh9caST2",
+            });
+        })();
+    </script>
 </head>
 
 <body>
@@ -126,8 +133,10 @@
                                     <div class="input-group">
                                         <input type="email" class="form-control" id="inviteMail"
                                             placeholder="Enter email" required>
-                                        <button class="btn btn-sm btn-danger add-email-btn">-</button>
-                                        <button class="btn btn-sm btn-success remove-email-btn">+</button>
+                                        <!-- Remove button is hidden by default -->
+                                        <button class="btn btn-sm btn-danger remove-email-btn" type="button"
+                                            style="display: none;">-</button>
+                                        <button class="btn btn-sm btn-success add-email-btn" type="button">+</button>
                                     </div>
                                 </div>
                             </div>
@@ -152,6 +161,66 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const emailContainer = document.getElementById('emailContainer');
+
+            // Add new email field
+            emailContainer.addEventListener('click', function (e) {
+                if (e.target.classList.contains('add-email-btn')) {
+                    const newEmailField = `
+                <div class="mb-3 email-field">
+                    <label class="form-label">Email</label>
+                    <div class="input-group">
+                        <input type="email" class="form-control" id="inviteMail" placeholder="Enter email" required>
+                        <!-- Remove button is visible for dynamically added fields -->
+                        <button class="btn btn-sm btn-danger remove-email-btn" type="button">-</button>
+                        <button class="btn btn-sm btn-success add-email-btn" type="button">+</button>
+                    </div>
+                </div>
+            `;
+                    emailContainer.insertAdjacentHTML('beforeend', newEmailField);
+                }
+            });
+
+            // Remove email field
+            emailContainer.addEventListener('click', function (e) {
+                if (e.target.classList.contains('remove-email-btn')) {
+                    if (confirm('Are you sure you want to delete this email field?')) {
+                        e.target.closest('.email-field').remove();
+                    }
+                }
+            });
+
+            // Form submission
+            document.getElementById('inviteBtn').addEventListener('click', function () {
+                const emailFields = document.querySelectorAll('#inviteMail');
+                let isValid = true;
+
+                emailFields.forEach(function (field) {
+                    if (field.value.trim() === '') {
+                        isValid = false;
+                        field.classList.add('is-invalid');
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                if (isValid) {
+                    emailjs.send("service_kgh8ub1", "template_9iabem3", emailParams)
+                        .then(function (response) {
+                            showAlert("Submission successful! A confirmation email has been sent.");
+                            document.getElementById("inviteForm").reset();
+                        }, function (error) {
+                            console.error("Error:", error);
+                            showAlert("Failed to send email. Please try again.");
+                        });
+                } else {
+                    alert('Please fill all email fields.');
+                }
+            });
+        });
+    </script>
     <!-- Footer -->
     <div class="container mt-5" id="contactUs">
         <footer class="py-3 my-4">

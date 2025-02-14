@@ -40,3 +40,23 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Center the form and add a card */
+.form-card {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Style the "Learn More" button */
+.btn-learn-more {
+  margin-left: 10px;
+}
+
+/* Ensure file input doesn't overflow */
+.form-control-file {
+  max-width: 100%;
+}

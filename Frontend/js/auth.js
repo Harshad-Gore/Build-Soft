@@ -248,8 +248,8 @@ document.addEventListener('DOMContentLoaded', function () {
             showAlert("Please fill all fields!");
             return;
         }
-        // genrate unique code
-        const inviteToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        // generate unique code
+        const inviteToken = crypto.randomUUID();
         try {
             await setDoc(doc(db, "pending_invites", inviteMail), {
                 email: inviteMail,
@@ -257,16 +257,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 token: inviteToken,
                 createdAt: new Date().toISOString()
             });
-            const inviteLink = `http://localhost:5173/signup.html?invite=${inviteToken}`;
-
-            const subject = encodeURIComponent("You're Invited to Join!");
-            const body = encodeURIComponent(`Hello,\n\nYou have been invited to join. Click the link below to sign up:\n${inviteLink}\n\nBest regards,\nYour Team`);
-
-            window.location.href = `mailto:${inviteMail}?subject=${subject}&body=${body}`;
-
-            showAlert(`Invitation sent! Ask the user to check their email: ${inviteMail}`);
         } catch (error) {
-            showAlert("Error sending invitation: " + error.message);
+            showAlert("Error updating firebase: " + error.message);
         }
+        const inviteLink = `http://localhost:5173/signup.html&role=${inviteType}?invite=${inviteToken}`;
+        const emailParams = {
+            email: inviteMail,
+            user_name: inviteMail,
+            role: inviteType,
+            invite_link: inviteLink
+        };
     });
 });

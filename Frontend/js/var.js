@@ -1,9 +1,119 @@
+// showAlert Function
+function showAlert(message, onConfirm, onCancel) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    document.body.appendChild(overlay);
+
+    // Create custom alert box
+    const alertBox = document.createElement('div');
+    alertBox.className = 'custom-alert';
+    alertBox.innerHTML = `
+                <p>${message}</p>
+                <div class="button-container">
+                    <button class="btn btn-danger btn-sm" id="alertConfirmBtn">Confirm</button>
+                    <button class="btn btn-success btn-sm" id="alertCancelBtn">Cancel</button>
+                </div>
+            `;
+    document.body.appendChild(alertBox);
+
+    // Handle Confirm button click
+    document.getElementById('alertConfirmBtn').addEventListener('click', () => {
+        // Fade out the alert box and overlay
+        alertBox.style.transition = 'opacity 0.5s';
+        overlay.style.transition = 'opacity 0.5s';
+        alertBox.style.opacity = '0';
+        overlay.style.opacity = '0';
+
+        // Remove elements after fade-out
+        setTimeout(() => {
+            alertBox.remove();
+            overlay.remove();
+        }, 500);
+
+        // Execute the onConfirm callback if provided
+        if (typeof onConfirm === 'function') {
+            onConfirm();
+        }
+    });
+
+    // Handle Cancel button click
+    document.getElementById('alertCancelBtn').addEventListener('click', () => {
+        // Fade out the alert box and overlay
+        alertBox.style.transition = 'opacity 0.5s';
+        overlay.style.transition = 'opacity 0.5s';
+        alertBox.style.opacity = '0';
+        overlay.style.opacity = '0';
+
+        // Remove elements after fade-out
+        setTimeout(() => {
+            alertBox.remove();
+            overlay.remove();
+        }, 500);
+
+        // Execute the onCancel callback if provided
+        if (typeof onCancel === 'function') {
+            onCancel();
+        }
+    });
+}
+
+// Add Author Function
 function addAuthor() {
-    let authorsDiv = document.getElementById("authors");
-    let newFields = `<input type="text" placeholder="Author Name" class="author_name">
-                     <input type="text" placeholder="Affiliation" class="author_affiliation">
-                     <input type="email" placeholder="Email" class="author_email"><br><br>`;
-    authorsDiv.innerHTML += newFields;
+    const authorsDiv = document.getElementById("authors");
+    const newRow = document.createElement('div');
+    newRow.className = 'row g-3 mb-3';
+    newRow.innerHTML = `
+        <div class="col-md-4">
+            <input type="text" placeholder="Author Name" class="form-control author_name" required>
+        </div>
+        <div class="col-md-4">
+            <input type="text" placeholder="Affiliation" class="form-control author_affiliation" required>
+        </div>
+        <div class="col-md-4">
+            <input type="email" placeholder="Email" class="form-control author_email" required>
+        </div>
+    `;
+    showAlert(
+        'Are you sure you want to add this author?',
+        () => {
+            authorsDiv.appendChild(newRow);
+        },
+        () => {
+            // If canceled, do nothing
+        }
+    );
+}
+
+// Show Terms and Conditions PDF
+function showTerms() {
+    const pdfModal = new bootstrap.Modal(document.getElementById('pdfModal'));
+    const pdfViewer = document.getElementById('pdfViewer');
+    pdfViewer.src = '/src/assets/Buildsoft_Publications.pdf';
+    pdfModal.show();
+}
+
+// removeAuthor Function (Fixed)
+function removeAuthor(event) {
+    // Get the button that was clicked
+    const deleteButton = event.target;
+
+    // Find the closest author row
+    const authorRow = deleteButton.closest('.row');
+
+    // Show confirmation dialog
+    showAlert(
+        'Are you sure you want to delete this author?',
+        () => {
+            // If confirmed, remove the author row
+            if (authorRow) {
+                authorRow.remove();
+            }
+        },
+        () => {
+            // If canceled, do nothing
+        }
+    );
 }
 
 document.getElementById("journalForm").onsubmit = async function (event) {

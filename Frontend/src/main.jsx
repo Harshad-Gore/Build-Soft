@@ -81,31 +81,3 @@ document.getElementById('forgotPassword').addEventListener('click', async (event
   document.querySelector('.forgot-password-container').classList.remove('d-none');
 });
 
-
-document.addEventListener('DOMContentLoaded', function () {
-  const emailContainer = document.getElementById('emailContainer');
-
-  emailContainer.addEventListener('click', function (event) {
-    if (event.target.classList.contains('add-email-btn')) {
-      event.preventDefault();
-      const newEmailField = document.createElement('div');
-      newEmailField.className = 'mb-3 email-field';
-      newEmailField.innerHTML = `
-              <label for="inviteMail" class="form-label">Email</label>
-              <div class="input-group">
-                  <input type="email" class="form-control" placeholder="Enter email" required>
-                  <button class="btn btn-danger btn-sm remove-email-btn">-</button>
-                  <button class="btn btn-success btn-sm add-email-btn">+</button>
-              </div>
-          `;
-      emailContainer.appendChild(newEmailField);
-    }
-
-    if (event.target.classList.contains('remove-email-btn')) {
-      event.preventDefault();
-      const emailField = event.target.closest('.email-field');
-      emailField.remove();
-    }
-  });
-});
-

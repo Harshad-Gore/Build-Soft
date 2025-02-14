@@ -120,51 +120,92 @@
         </div>
     </nav>
     <!-- Submission Form -->
-    
-    <form id="journalForm" enctype="multipart/form-data" class="container mt-5">
-        <div class="mb-3">
-            <label for="title" class="form-label">Title:</label>
-            <input type="text" id="title" class="form-control" required>
-        </div>
-    
-        <div class="mb-3">
-            <label for="abstract" class="form-label">Abstract:</label>
-            <textarea id="abstract" class="form-control" rows="4" required></textarea>
-        </div>
-    
-        <div class="mb-3">
-            <label for="keywords" class="form-label">Keywords:</label>
-            <input type="text" id="keywords" class="form-control" required>
-        </div>
-    
-        <div class="mb-3">
-            <label for="email" class="form-label">Email:</label>
-            <input type="email" id="email" class="form-control" required>
-        </div>
-    
-        <div class="mb-3">
-            <label for="file" class="form-label">Upload Journal (PDF/DOCX):</label>
-            <input type="file" id="file" class="form-control" required>
-        </div>
-    
-        <h3>Authors</h3>
-        <div id="authors" class="mb-3">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <input type="text" placeholder="Author Name" class="form-control author_name">
+    <br>
+    <div class="form-card container mt-5">
+        <h2 class="page-heading">Journal Submission</h2>
+        <br>
+        <form id="journalForm" enctype="multipart/form-data">
+            <!-- Title and Email -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="title" class="form-label">Title:</label>
+                    <input type="text" id="title" class="form-control" required>
                 </div>
-                <div class="col-md-4">
-                    <input type="text" placeholder="Affiliation" class="form-control author_affiliation">
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" id="email" class="form-control" required>
                 </div>
-                <div class="col-md-4">
-                    <input type="email" placeholder="Email" class="form-control author_email">
+            </div>
+
+            <!-- Keywords and File Upload -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="keywords" class="form-label">Keywords:</label>
+                    <input type="text" id="keywords" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="file" class="form-label">Upload Journal:</label>
+                    <input type="file" id="file" class="form-control form-control-file" required>
+                </div>
+            </div>
+
+            <!-- Abstract -->
+            <div class="mb-3">
+                <label for="abstract" class="form-label">Abstract:</label>
+                <textarea id="abstract" class="form-control" rows="4" required></textarea>
+            </div>
+
+            <!-- Authors Section -->
+            <h3 class="sub-heading">Authors</h3>
+            <div id="authors" class="mb-3">
+                <div class="row g-3 mb-3">
+                    
+                    <div class="col-md-4">
+                        <input type="text" placeholder="Author Name" class="form-control author_name" required>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" placeholder="Affiliation" class="form-control author_affiliation" required>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="email" placeholder="Email" class="form-control author_email" required>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-success mb-3" onclick="addAuthor()">Add Author</button>
+
+            <!-- Terms and Conditions -->
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="terms" required>
+                <label class="form-check-label" for="terms">
+                    I accept the <a href="#" onclick="showTerms()">terms and conditions</a>.
+                </label>
+                <button type="button" class="btn btn-sm btn-learn-more btn-outline-secondary"
+                    onclick="showTerms()">Learn More</button>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <!-- PDF Modal -->
+    <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pdfModalLabel">Terms and Conditions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="pdfViewer" src="" width="100%" height="500px" style="border: none;"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
-    
-        <button type="button" class="btn btn-secondary mb-3" onclick="addAuthor()">Add Another Author</button>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+    </div>
+
 
     <!-- Footer -->
     <div class="container mt-5" id="contactUs">
@@ -222,6 +263,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script type="module" src="/src/main.jsx"></script>
     <script type="module" src="js/auth.js"></script>
     <script src="js/var.js"></script>
