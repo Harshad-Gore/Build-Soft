@@ -1,3 +1,28 @@
+function showAlertMessage(message) {
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    document.body.appendChild(overlay);
+
+    const alertBox = document.createElement('div');
+    alertBox.className = 'custom-alert';
+    alertBox.innerHTML = `
+<p>${message}</p>
+<button class="btn btn-warning btn-sm" id="alertOkBtn">Okay</button>
+`;
+    document.body.appendChild(alertBox);
+
+    document.getElementById('alertOkBtn').addEventListener('click', () => {
+        alertBox.style.transition = 'opacity 0.5s';
+        overlay.style.transition = 'opacity 0.5s';
+        alertBox.style.opacity = '0';
+        overlay.style.opacity = '0';
+
+        setTimeout(() => {
+            alertBox.remove();
+            overlay.remove();
+        }, 500);
+    });
+}
 // showAlert Function
 function showAlert(message, onConfirm, onCancel) {
     // Create overlay
@@ -141,7 +166,7 @@ document.getElementById("journalForm").onsubmit = async function (event) {
         body: formData
     });
 
-    alert(await response.text());
+    showAlertMessage(await response.text());
 };
 
 document.getElementById("journalForm").addEventListener("submit", function (event) {
@@ -164,10 +189,9 @@ document.getElementById("journalForm").addEventListener("submit", function (even
     // Send email using EmailJS
     emailjs.send("service_kgh8ub1", "template_9iabem3", emailParams)
         .then(function (response) {
-            alert("Submission successful! A confirmation email has been sent.");
-            document.getElementById("journalForm").reset(); // Reset form
+            document.getElementById("journalForm").reset();
         }, function (error) {
             console.error("Error:", error);
-            alert("Failed to send email. Please try again.");
+            alert("An error occurred while sending the confirmation email!");
         });
 });

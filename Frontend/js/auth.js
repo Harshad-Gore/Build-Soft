@@ -260,12 +260,21 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (error) {
             showAlert("Error updating firebase: " + error.message);
         }
-        const inviteLink = `http://localhost:5173/signup.html&role=${inviteType}?invite=${inviteToken}`;
+        const inviteLink = `http://localhost:5173/signup.html?invite=${inviteToken}`;
         const emailParams = {
             email: inviteMail,
             user_name: inviteMail,
             role: inviteType,
             invite_link: inviteLink
         };
+        // Send email using EmailJS
+        emailjs.send("service_kgh8ub1", "template_jwz7tdl", emailParams)
+            .then(function (response) {
+                showAlert("Invitation sent successfully!");
+                document.getElementById("inviteForm").reset(); // Reset form
+            }, function (error) {
+                console.error("Error:", error);
+                showAlert("Failed to send email. Please try again.");
+            });
     });
 });

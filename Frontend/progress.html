@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submission Status</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Elegant Container */
+        .card {
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .sub-heading {
+            font-size: 24px;
+            font-weight: bold;
+            color: #343a40;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Elegant Form */
+        .form-group label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #6a11cb;
+            box-shadow: 0 0 8px rgba(106, 17, 203, 0.3);
+        }
+
+        /* Elegant Button */
+        .btn-primary {
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(106, 17, 203, 0.3);
+        }
+
+        /* Stunning Progress Bar */
+        .progress-bar {
+            height: 30px;
+            background-color: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Percentage Text */
+        .progress-bar-fill::after {
+            content: attr(data-progress);
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Glow Effect */
+        .progress-bar-fill::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Roadmap Stages */
+        .roadmap {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .roadmap::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #e9ecef;
+            z-index: 1;
+        }
+
+        .stage {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+            margin: 0 5px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .stage i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #6a11cb;
+        }
+
+        .stage.active {
+            background-color: #28a745;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .stage.active i {
+            color: white;
+        }
+        #submissionTitle{
+            font-size: 20px;
+            font-weight: bold;
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 20px;
+            }
+
+            .sub-heading {
+                font-size: 20px;
+            }
+
+            .form-control {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .btn-primary {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .roadmap {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .roadmap::before {
+                display: none;
+            }
+
+            .stage {
+                width: 80%;
+                margin: 10px 0;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-shadow mt-5">
+                    <div class="card-body">
+                        <h3 class="sub-heading">Check Submission Status</h3>
+                        <form id="statusForm">
+                            <div class="form-group">
+                                <label for="submissionId">Enter Submission ID:</label>
+                                <input type="text" class="form-control" id="submissionId" placeholder="e.g., 123"
+                                    required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Check Status</button>
+                        </form>
+                        <div id="statusDisplay" class="mt-4" style="display: none;">
+                            <h4 id="submissionTitle"></h4>
+                            <div class="roadmap">
+                                <div class="stage" id="submitted">
+                                    <i class="fas fa-file-upload"></i>
+                                    <div>Submitted</div>
+                                </div>
+                                <div class="stage" id="pending">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    <div>Pending Review</div>
+                                </div>
+                                <div class="stage" id="review">
+                                    <i class="fas fa-search"></i>
+                                    <div>Review</div>
+                                </div>
+                                <div class="stage" id="approval">
+                                    <i class="fas fa-check-circle"></i>
+                                    <div>Approval</div>
+                                </div>
+                                <div class="stage" id="approved">
+                                    <i class="fas fa-check-double"></i>
+                                    <div>Approved</div>
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" id="progressBarFill" data-progress="0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle form submission
+        document.getElementById("statusForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const submissionId = document.getElementById("submissionId").value;
+
+            if (!submissionId) {
+                alert("Please enter a valid submission ID.");
+                return;
+            }
+
+            console.log("Fetching status for submission ID:", submissionId); // Debugging
+
+            // Send a GET request to fetch the status and title
+            fetch(`http://localhost:3000/submission-status/${submissionId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok. Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Fetched status data:", data); // Debugging
+                    const { status, title } = data;
+                    updateStatusDisplay(status, title); // Pass both status and title
+                })
+                .catch(error => {
+                    console.error("Error fetching submission status:", error);
+                    alert("Failed to fetch submission status. Please try again.");
+                });
+        });
+
+        // Update the status display
+        function updateStatusDisplay(status, title) {
+            const statusDisplay = document.getElementById("statusDisplay");
+            const submissionTitle = document.getElementById("submissionTitle");
+
+            // Display the title
+            submissionTitle.textContent = `Title: ${title}`;
+
+            const stages = {
+                Submitted: "submitted",
+                "Pending Review": "pending",
+                Review: "review",
+                Approval: "approval",
+                Approved: "approved",
+            };
+
+            // Reset all stages
+            Object.values(stages).forEach(stageId => {
+                document.getElementById(stageId).classList.remove("active");
+            });
+
+            // Highlight the current stage
+            if (stages[status]) {
+                document.getElementById(stages[status]).classList.add("active");
+            }
+
+            // Update progress bar
+            const progressBarFill = document.getElementById("progressBarFill");
+            const progress = {
+                Submitted: "20%",
+                "Pending Review": "40%",
+                Review: "60%",
+                Approval: "80%",
+                Approved: "100%",
+            };
+            const currentProgress = progress[status] || "0%";
+            progressBarFill.style.width = currentProgress;
+            progressBarFill.setAttribute("data-progress", currentProgress);
+
+            // Show the status display
+            statusDisplay.style.display = "block";
+        }
+    </script>
+</body>
+
+</html>

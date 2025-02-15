@@ -4,6 +4,7 @@ const multer = require("multer");
 const path = require("path");
 const bodyParser = require("body-parser");
 const cors = require("cors"); // Allow frontend to call backend
+const { v4: uuidv4 } = require("uuid");
 
 const app = express();
 const PORT = 3000;
@@ -22,8 +23,12 @@ const db = mysql.createConnection({
 });
 
 db.connect((err) => {
-  if (err) console.error("MySQL connection failed:", err);
-  else console.log("Connected to MySQL!");
+  if (err) {
+    console.error("MySQL connection failed:", err);
+    process.exit(1); // Exit the process if the connection fails
+  } else {
+    console.log("Connected to MySQL!");
+  }
 });
 
 // File Upload Setup
@@ -56,15 +61,18 @@ app.post("/submit", upload.single("file"), async (req, res) => {
       return res.status(400).send("Error parsing authors JSON!");
     }
 
-    // Insert journal entry first
-    const sql = "INSERT INTO journals (title, abstract, keywords, file_path, email) VALUES (?, ?, ?, ?, ?)";
-    db.query(sql, [title, abstract, keywords, filePath, email], (err, result) => {
+    // Generate a UUID for journal_id
+    const journalId = uuidv4();
+    console.log("Generated Journal ID:", journalId);
+
+    // Insert journal entry
+    const sql = "INSERT INTO journals (journal_id, title, abstract, keywords, file_path, email) VALUES (?, ?, ?, ?, ?, ?)";
+    db.query(sql, [journalId, title, abstract, keywords, filePath, email], (err, result) => {
       if (err) {
         console.error("Database Error:", err);
         return res.status(500).send("Database error: " + err);
       }
 
-      const journalId = result.insertId;
       console.log("Journal Inserted with ID:", journalId);
 
       // Insert authors into the `authors` table
@@ -92,11 +100,72 @@ app.post("/submit", upload.single("file"), async (req, res) => {
 app.get("/submissions", (req, res) => {
   const sql = "SELECT * FROM journals";
   db.query(sql, (err, results) => {
-    if (err) return res.status(500).send("Database error: " + err);
+    if (err) {
+      console.error("Database Error:", err); // Debugging
+      return res.status(500).send("Database error: " + err);
+    }
     res.json(results);
   });
 });
 
+app.post("/update-status/:id", (req, res) => {
+  const journalId = req.params.id;
+  const { status } = req.body;
+
+  console.log("Received request to update status:", { journalId, status }); // Debugging
+
+  if (!journalId || !status) {
+    console.error("Invalid Journal ID or status:", { journalId, status }); // Debugging
+    return res.status(400).json({ message: "Invalid Journal ID or status" });
+  }
+
+  const allowedStatuses = ["Submitted", "Pending Review", "Review", "Approval", "Approved"];
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  const sql = "UPDATE journals SET status = ? WHERE journal_id = ?";
+  db.query(sql, [status, journalId], (err, result) => {
+    if (err) {
+      console.error("Database Error:", err); // Debugging
+      return res.status(500).json({ message: "Database error" });
+    }
+
+    if (result.affectedRows === 0) {
+      console.error("Journal not found with ID:", journalId); // Debugging
+      return res.status(404).json({ message: "Journal not found" });
+    }
+
+    console.log("Status updated successfully for journal ID:", journalId); // Debugging
+    res.json({ message: "Status updated successfully!" });
+  });
+});
+
+// API to Fetch Submission Status and Title by ID
+app.get("/submission-status/:id", (req, res) => {
+  const journalId = req.params.id;
+
+  if (!journalId) {
+    return res.status(400).json({ message: "Invalid Journal ID" });
+  }
+
+  const sql = "SELECT status, title FROM journals WHERE journal_id = ?";
+  db.query(sql, [journalId], (err, result) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res.status(500).json({ message: "Database error" });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Journal not found" });
+    }
+
+    const { status, title } = result[0];
+    res.json({ status, title }); // Return both status and title
+  });
+});
+
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
