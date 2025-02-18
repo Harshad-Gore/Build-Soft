@@ -94,7 +94,7 @@
                         <a class="nav-link" href="guidelines.html">Guidelines</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="membership.html">Membership</a>
+                        <a class="nav-link" href="membership.html">Membership</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#contactUs">Contact Us</a>
@@ -104,6 +104,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="admin.html">Admins</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="progress.html">Progress</a>
                     </li>
                     <!-- <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -165,6 +168,64 @@
         </div>
     </div>
     <script>
+        function displayAlert(message, onConfirm, onCancel) {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            document.body.appendChild(overlay);
+
+            // Create custom alert box
+            const alertBox = document.createElement('div');
+            alertBox.className = 'custom-alert';
+            alertBox.innerHTML = `
+                <p>${message}</p>
+                <div class="button-container">
+                    <button class="btn btn-danger btn-sm" id="alertConfirmBtn">Confirm</button>
+                    <button class="btn btn-success btn-sm" id="alertCancelBtn">Cancel</button>
+                </div>
+            `;
+            document.body.appendChild(alertBox);
+
+            // Handle Confirm button click
+            document.getElementById('alertConfirmBtn').addEventListener('click', () => {
+                // Fade out the alert box and overlay
+                alertBox.style.transition = 'opacity 0.5s';
+                overlay.style.transition = 'opacity 0.5s';
+                alertBox.style.opacity = '0';
+                overlay.style.opacity = '0';
+
+                // Remove elements after fade-out
+                setTimeout(() => {
+                    alertBox.remove();
+                    overlay.remove();
+                }, 500);
+
+                // Execute the onConfirm callback if provided
+                if (typeof onConfirm === 'function') {
+                    onConfirm();
+                }
+            });
+
+            // Handle Cancel button click
+            document.getElementById('alertCancelBtn').addEventListener('click', () => {
+                // Fade out the alert box and overlay
+                alertBox.style.transition = 'opacity 0.5s';
+                overlay.style.transition = 'opacity 0.5s';
+                alertBox.style.opacity = '0';
+                overlay.style.opacity = '0';
+
+                // Remove elements after fade-out
+                setTimeout(() => {
+                    alertBox.remove();
+                    overlay.remove();
+                }, 500);
+
+                // Execute the onCancel callback if provided
+                if (typeof onCancel === 'function') {
+                    onCancel();
+                }
+            });
+        }
         document.addEventListener('DOMContentLoaded', function () {
             const emailContainer = document.getElementById('emailContainer');
 
@@ -189,9 +250,15 @@
             // Remove email field
             emailContainer.addEventListener('click', function (e) {
                 if (e.target.classList.contains('remove-email-btn')) {
-                    if (confirm('Are you sure you want to delete this email field?')) {
-                        e.target.closest('.email-field').remove();
-                    }
+                    displayAlert(
+                        'Are you sure you want to remove this field?',
+                        () => {
+                            e.target.closest('.email-field').remove();
+                        },
+                        () => {
+                            // If canceled, do nothing
+                        }
+                    );
                 }
             });
 
@@ -210,6 +277,7 @@
                                 <tr>
                                     <th scope="col">S.No</th>
                                     <th scope="col">Title</th>
+                                    <th scope="col">Authors</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Submission</th>
                                     <th scope="col">Status</th>
@@ -234,9 +302,9 @@
             const alertBox = document.createElement('div');
             alertBox.className = 'custom-alert';
             alertBox.innerHTML = `
-        <p>${message}</p>
-        <button class="btn btn-warning btn-sm" id="alertOkBtn">Okay</button>
-    `;
+                <p>${message}</p>
+                <button class="btn btn-warning btn-sm" id="alertOkBtn">Okay</button>
+            `;
             document.body.appendChild(alertBox);
 
             document.getElementById('alertOkBtn').addEventListener('click', () => {
@@ -263,9 +331,19 @@
                     data.forEach((submission, index) => {
                         const row = document.createElement("tr");
 
+                        // Create a dropdown for authors
+                        const authorsDropdown = `
+                    <select class="form-control authors-dropdown">
+                        ${submission.authors.split(', ').map(author => `
+                            <option value="${author}">${author}</option>
+                        `).join('')}
+                    </select>
+                `;
+
                         row.innerHTML = `
                     <th scope="row">${index + 1}</th>
                     <td>${submission.title}</td>
+                    <td>${authorsDropdown}</td>
                     <td>${submission.email}</td>
                     <td><a href="http://localhost:3000/${submission.file_path}" target="_blank">Download</a></td>
                     <td>
@@ -282,7 +360,7 @@
                         submissionTable.appendChild(row);
                     });
 
-                    // Add event listeners to dropdowns
+                    // Add event listeners to status dropdowns
                     document.querySelectorAll(".status-dropdown").forEach(dropdown => {
                         dropdown.addEventListener("change", function () {
                             const journalId = this.getAttribute("data-journal-id");
@@ -315,7 +393,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    alert(data.message);
+                    showAlert(data.message);
                     fetchSubmissions(); // Refresh the table
                 })
                 .catch(error => {

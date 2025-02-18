@@ -98,10 +98,10 @@ app.post("/submit", upload.single("file"), async (req, res) => {
 
 // API to Fetch Submissions
 app.get("/submissions", (req, res) => {
-  const sql = "SELECT * FROM journals";
+  const sql = "SELECT j.journal_id, j.title, j.abstract, j.keywords, j.submission_date, j.file_path, j.email, j.status, GROUP_CONCAT(a.name ORDER BY a.author_id SEPARATOR ', ') AS authors, GROUP_CONCAT(a.affiliation SEPARATOR ', ') AS affiliations, GROUP_CONCAT(a.email SEPARATOR ', ') AS author_emails FROM journals j LEFT JOIN authors a ON j.journal_id = a.journal_id GROUP BY j.journal_id";
   db.query(sql, (err, results) => {
     if (err) {
-      console.error("Database Error:", err); // Debugging
+      console.error("Database Error:", err);
       return res.status(500).send("Database error: " + err);
     }
     res.json(results);

@@ -99,7 +99,7 @@ function addAuthor() {
             <input type="email" placeholder="Email" class="form-control author_email" required>
         </div>
     `;
-    showAlert(
+    showAlertMessage(
         'Are you sure you want to add this author?',
         () => {
             authorsDiv.appendChild(newRow);
@@ -195,3 +195,41 @@ document.getElementById("journalForm").addEventListener("submit", function (even
             alert("An error occurred while sending the confirmation email!");
         });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const emailContainer = document.getElementById('emailContainer');
+  
+    // Add new email field
+    emailContainer.addEventListener('click', function (e) {
+        if (e.target.classList.contains('add-email-btn')) {
+            const newEmailField = `
+        <div class="mb-3 email-field">
+            <label class="form-label">Email</label>
+            <div class="input-group">
+                <input type="email" class="form-control" id="inviteMail" placeholder="Enter email" required>
+                <!-- Remove button is visible for dynamically added fields -->
+                <button class="btn btn-sm btn-danger remove-email-btn" type="button">-</button>
+                <button class="btn btn-sm btn-success add-email-btn" type="button">+</button>
+            </div>
+        </div>
+    `;
+            emailContainer.insertAdjacentHTML('beforeend', newEmailField);
+        }
+    });
+  
+    // Remove email field
+    emailContainer.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-email-btn')) {
+            showAlertMessage(
+                'Are you sure you want to remove this field?',
+                () => {
+                    e.target.closest('.email-field').remove();
+                },
+                () => {
+                    // If canceled, do nothing
+                }
+            );
+        }
+    });
+  
+  });

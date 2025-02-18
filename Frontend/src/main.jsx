@@ -81,3 +81,29 @@ document.getElementById('forgotPassword').addEventListener('click', async (event
   document.querySelector('.forgot-password-container').classList.remove('d-none');
 });
 
+function showAlertMessage(message) {
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  document.body.appendChild(overlay);
+
+  const alertBox = document.createElement('div');
+  alertBox.className = 'custom-alert';
+  alertBox.innerHTML = `
+<p>${message}</p>
+<button class="btn btn-warning btn-sm" id="alertOkBtn">Okay</button>
+`;
+  document.body.appendChild(alertBox);
+
+  document.getElementById('alertOkBtn').addEventListener('click', () => {
+      alertBox.style.transition = 'opacity 0.5s';
+      overlay.style.transition = 'opacity 0.5s';
+      alertBox.style.opacity = '0';
+      overlay.style.opacity = '0';
+
+      setTimeout(() => {
+          alertBox.remove();
+          overlay.remove();
+      }, 500);
+  });
+}
+
