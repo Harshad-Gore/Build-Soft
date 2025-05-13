@@ -99,7 +99,7 @@ function addAuthor() {
             <input type="email" placeholder="Email" class="form-control author_email" required>
         </div>
     `;
-    showAlertMessage(
+    showAlert(
         'Are you sure you want to add this author?',
         () => {
             authorsDiv.appendChild(newRow);
@@ -159,7 +159,14 @@ document.getElementById("journalForm").onsubmit = async function (event) {
     formData.append("keywords", document.getElementById("keywords").value);
     formData.append("email", document.getElementById("email").value);
     formData.append("authors", JSON.stringify(authors));
-    formData.append("file", document.getElementById("file").files[0]);
+    formData.append("journal", document.getElementById("journal_file").files[0]);
+    formData.append("manuscript", document.getElementById("pdfFile").files[0]);
+    formData.append("edtitableManuscript", document.getElementById("docFile").files[0]);
+    formData.append("supplementary", document.getElementById("suppFiles").files[0]);
+    formData.append("copyright", document.getElementById("copyright").files[0]);
+    formData.append("coverLetter", document.getElementById("coverLetter").value);
+    formData.append("conflictOfInterest", document.getElementById("conflict").value);
+    formData.append("termsConditions", document.getElementById("terms").checked);
 
     let response = await fetch("http://localhost:3000/submit", {
         method: "POST",
@@ -196,40 +203,3 @@ document.getElementById("journalForm").addEventListener("submit", function (even
         });
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-    const emailContainer = document.getElementById('emailContainer');
-  
-    // Add new email field
-    emailContainer.addEventListener('click', function (e) {
-        if (e.target.classList.contains('add-email-btn')) {
-            const newEmailField = `
-        <div class="mb-3 email-field">
-            <label class="form-label">Email</label>
-            <div class="input-group">
-                <input type="email" class="form-control" id="inviteMail" placeholder="Enter email" required>
-                <!-- Remove button is visible for dynamically added fields -->
-                <button class="btn btn-sm btn-danger remove-email-btn" type="button">-</button>
-                <button class="btn btn-sm btn-success add-email-btn" type="button">+</button>
-            </div>
-        </div>
-    `;
-            emailContainer.insertAdjacentHTML('beforeend', newEmailField);
-        }
-    });
-  
-    // Remove email field
-    emailContainer.addEventListener('click', function (e) {
-        if (e.target.classList.contains('remove-email-btn')) {
-            showAlertMessage(
-                'Are you sure you want to remove this field?',
-                () => {
-                    e.target.closest('.email-field').remove();
-                },
-                () => {
-                    // If canceled, do nothing
-                }
-            );
-        }
-    });
-  
-  });

@@ -143,29 +143,54 @@
                 </div>
             </div>
 
-            <!-- Keywords and File Upload -->
+            <!-- Keywords and Manuscript Upload -->
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <label for="keywords" class="form-label">Keywords:</label>
                     <input type="text" id="keywords" class="form-control" required>
                 </div>
                 <div class="col-md-6">
-                    <label for="file" class="form-label">Upload Journal:</label>
-                    <input type="file" id="file" class="form-control form-control-file" required>
+                    <label for="pdfFile" class="form-label">Upload Manuscript (PDF):</label>
+                    <input type="file" name="files" id="pdfFile" class="form-control" accept=".pdf" required>
+                </div>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="docFile" class="form-label">Upload Editable Manuscript (DOCX/LaTeX):</label>
+                    <input type="file" name="files" id="docFile" class="form-control" accept=".docx,.tex" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="suppFiles" class="form-label">Supplementary Files (Optional):</label>
+                    <input type="file" name="files" id="suppFiles" class="form-control" multiple>
+                </div>
+                <!-- Copyright Transfer -->
+                <div class="col-md-6">
+                    <label for="copyright" class="form-label">Upload IEEE Copyright Form:</label>
+                    <input type="file" name="files" id="copyright" class="form-control" accept=".pdf" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="journal_file" class="form-label">Journal File</label>
+                    <input type="file" name="files" id="journal_file" class="form-control" accept=".pdf" required>
                 </div>
             </div>
 
-            <!-- Abstract -->
+            <br>
+            <!-- Cover Letter -->
             <div class="mb-3">
-                <label for="abstract" class="form-label">Abstract:</label>
-                <textarea id="abstract" class="form-control" rows="4" required></textarea>
+                <label for="coverLetter" class="form-label">Cover Letter:</label>
+                <textarea id="coverLetter" class="form-control" rows="4" required></textarea>
+            </div>
+
+            <!-- Conflict of Interest -->
+            <div class="mb-3">
+                <label for="conflict" class="form-label">Conflict of Interest (if any):</label>
+                <textarea id="conflict" class="form-control" rows="2"></textarea>
             </div>
 
             <!-- Authors Section -->
             <h3 class="sub-heading">Authors</h3>
             <div id="authors" class="mb-3">
                 <div class="row g-3 mb-3">
-                    
                     <div class="col-md-4">
                         <input type="text" placeholder="Author Name" class="form-control author_name" required>
                     </div>
@@ -181,9 +206,9 @@
 
             <!-- Terms and Conditions -->
             <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="terms" required>
+                <input type="checkbox" class="form-check-input" id="terms" required value="accepted">
                 <label class="form-check-label" for="terms">
-                    I accept the <a href="#" onclick="showTerms()">terms and conditions</a>.
+                    I accept the <a href="#pdfModal" onclick="showTerms()">terms and conditions</a>.
                 </label>
                 <button type="button" class="btn btn-sm btn-learn-more btn-outline-secondary"
                     onclick="showTerms()">Learn More</button>
@@ -193,7 +218,6 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
-
     <!-- PDF Modal -->
     <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -211,7 +235,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Footer -->
     <div class="container mt-5" id="contactUs">

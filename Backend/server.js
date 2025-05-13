@@ -10,44 +10,23 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(express.static("uploads"));
-
-// MySQL Database Connection
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "Harsh@2004", // Change if necessary
-  database: "journal_submission_db",
-});
-
-db.connect((err) => {
-  if (err) {
-    console.error("MySQL connection failed:", err);
-    process.exit(1); // Exit the process if the connection fails
-  } else {
-    console.log("Connected to MySQL!");
-  }
-});
 
 // File Upload Setup
 const storage = multer.diskStorage({
   destination: "./uploads",
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    cb(null, Date.now() + "_" + file.originalname);
   },
 });
 
 const upload = multer({ storage });
 
 // API to Submit Journal
-app.post("/submit", upload.single("file"), async (req, res) => {
+app.post("/submit", upload.array("files", 6), async (req, res) => {
   try {
-    const { title, abstract, keywords, email } = req.body;
-    const filePath = req.file ? req.file.filename : null;
+    const { title, abstract, keywords, email, coverLetter, conflictOfInterest, termsConditions } = req.body;
 
-    if (!title || !abstract || !keywords || !email || !req.body.authors) {
+    if (!title || !abstract || !keywords || !email || !coverLetter || !termsConditions || !req.body.authors) {
       return res.status(400).send("Missing required fields!");
     }
 
@@ -65,31 +44,67 @@ app.post("/submit", upload.single("file"), async (req, res) => {
     const journalId = uuidv4();
     console.log("Generated Journal ID:", journalId);
 
-    // Insert journal entry
-    const sql = "INSERT INTO journals (journal_id, title, abstract, keywords, file_path, email) VALUES (?, ?, ?, ?, ?, ?)";
-    db.query(sql, [journalId, title, abstract, keywords, filePath, email], (err, result) => {
-      if (err) {
-        console.error("Database Error:", err);
-        return res.status(500).send("Database error: " + err);
+    // Extract file paths
+    let filePaths = {};
+    req.files.forEach((file) => {
+      if (file.mimetype.includes("pdf") && file.originalname.includes("manuscript")) {
+        filePaths["manuscript_pdf"] = file.filename;
+      } else if (file.mimetype.includes("msword") || file.originalname.includes("edtitableManuscript")) {
+        filePaths["editable_manuscript_doc"] = file.filename;
+      } else if (file.originalname.includes("supplementary")) {
+        filePaths["supplementary_file"] = file.filename;
+      } else if (file.originalname.includes("copyright")) {
+        filePaths["copyright_form"] = file.filename;
+      }else if (file.originalname.includes("journal")) {
+        filePaths["journal_file"] = file.filename;
       }
-
-      console.log("Journal Inserted with ID:", journalId);
-
-      // Insert authors into the `authors` table
-      const authorSQL = "INSERT INTO authors (journal_id, name, affiliation, email) VALUES (?, ?, ?, ?)";
-
-      let completedQueries = 0;
-      authorList.forEach((author) => {
-        db.query(authorSQL, [journalId, author.name, author.affiliation, author.email], (err, result) => {
-          if (err) console.error("Author Insert Error:", err);
-
-          completedQueries++;
-          if (completedQueries === authorList.length) {
-            res.send("Journal and Authors submitted successfully!");
-          }
-        });
-      });
     });
+
+    // Insert journal entry
+    const sql = `
+      INSERT INTO journals 
+      (journal_id, title, keywords, email, manucript_pdf, editable_manuscript_doc, supplementary_file, copyright_form, cover_letter, conflict_of_interest, terms_conditions) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    db.query(
+      sql,
+      [
+        journalId,
+        title,
+        keywords,
+        email,
+        filePaths.manuscript_pdf || null,
+        filePaths.editable_manuscript_doc || null,
+        filePaths.supplementary_file || null,
+        filePaths.copyright_form || null,
+        coverLetter,
+        conflictOfInterest,
+        termsConditions,
+      ],
+      (err, result) => {
+        if (err) {
+          console.error("Database Error:", err);
+          return res.status(500).send("Database error: " + err);
+        }
+
+        console.log("Journal Inserted with ID:", journalId);
+
+        // Insert authors
+        const authorSQL = "INSERT INTO authors (journal_id, name, affiliation, email) VALUES (?, ?, ?, ?)";
+
+        let completedQueries = 0;
+        authorList.forEach((author) => {
+          db.query(authorSQL, [journalId, author.name, author.affiliation, author.email], (err, result) => {
+            if (err) console.error("Author Insert Error:", err);
+
+            completedQueries++;
+            if (completedQueries === authorList.length) {
+              res.send("Journal and Authors submitted successfully!");
+            }
+          });
+        });
+      }
+    );
   } catch (error) {
     console.error("Server Error:", error);
     res.status(500).send("Internal Server Error!");

@@ -272,6 +272,69 @@
                 <div class="card card-shadow">
                     <div class="card-body">
                         <h3 class="sub-heading">Submissions</h3>
+                        <!-- filter box for easy access -->
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button"
+                                id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+                                Sort By
+                            </button>
+                            <div class="dropdown-menu sort-dropdown" aria-labelledby="dropdownMenuButton">
+                                <option class="dropdown-item" value="sortByAuthor">Author</option>
+                                <option class="dropdown-item" value="sortByStatus">Status</option>
+                                <option class="dropdown-item" value="sortByTitle">Title</option>
+                            </div>
+                        </div>
+
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function () {
+                                fetchSubmissions();
+
+                                document.querySelector(".sort-dropdown").addEventListener("click", function (e) {
+                                    if (e.target.classList.contains("dropdown-item")) {
+                                        const sortBy = e.target.value;
+                                        sortSubmissions(sortBy);
+
+                                        // Close the dropdown
+                                        const dropdownMenu = document.getElementById('dropdownMenuButton');
+                                        const bootstrapDropdown = bootstrap.Dropdown.getInstance(dropdownMenu);
+                                        bootstrapDropdown.hide();
+                                    }
+                                });
+                            });
+
+                            function sortSubmissions(sortBy) {
+                                const table = document.getElementById("submissionTable");
+                                let rows = Array.from(table.getElementsByTagName("tr"));
+
+                                rows.sort((rowA, rowB) => {
+                                    let valA, valB;
+
+                                    switch (sortBy) {
+                                        case "sortByAuthor":
+                                            valA = rowA.cells[2].textContent.trim().toLowerCase();
+                                            valB = rowB.cells[2].textContent.trim().toLowerCase();
+                                            break;
+                                        case "sortByStatus":
+                                            valA = rowA.cells[5].querySelector("select").value.toLowerCase();
+                                            valB = rowB.cells[5].querySelector("select").value.toLowerCase();
+                                            break;
+                                        case "sortByTitle":
+                                            valA = rowA.cells[1].textContent.trim().toLowerCase();
+                                            valB = rowB.cells[1].textContent.trim().toLowerCase();
+                                            break;
+                                        default:
+                                            return;
+                                    }
+
+                                    return valA.localeCompare(valB);
+                                });
+
+                                // Reorder the table
+                                table.innerHTML = "";
+                                rows.forEach(row => table.appendChild(row));
+                            }
+                        </script>
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
@@ -333,12 +396,12 @@
 
                         // Create a dropdown for authors
                         const authorsDropdown = `
-                    <select class="form-control authors-dropdown">
-                        ${submission.authors.split(', ').map(author => `
-                            <option value="${author}">${author}</option>
-                        `).join('')}
-                    </select>
-                `;
+                            <select class="form-select authors-dropdown">
+                                ${submission.authors.split(', ').map(author => `
+                                    <option value="${author}">${author}</option>
+                                `).join('')}
+                            </select>
+                        `;
 
                         row.innerHTML = `
                     <th scope="row">${index + 1}</th>
@@ -347,7 +410,7 @@
                     <td>${submission.email}</td>
                     <td><a href="http://localhost:3000/${submission.file_path}" target="_blank">Download</a></td>
                     <td>
-                        <select class="form-control status-dropdown" data-journal-id="${submission.journal_id}">
+                        <select class="form-select status-dropdown" data-journal-id="${submission.journal_id}" aria-labelledby="dropdownMenuButton">
                             <option value="Submitted" ${submission.status === "Submitted" ? "selected" : ""}>Submitted</option>
                             <option value="Pending Review" ${submission.status === "Pending Review" ? "selected" : ""}>Pending Review</option>
                             <option value="Review" ${submission.status === "Review" ? "selected" : ""}>Review</option>
